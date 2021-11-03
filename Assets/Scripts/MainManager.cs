@@ -9,12 +9,15 @@ public class MainManager : Singleton<MainManager>
     public GameObject menuPanel;
     public GameObject gamePanel;
     [Space]
-    public LineRendererController lineRendererController;
-    public GameObject lineParent;
+    public Transform rectangleParent;
+    public Transform rectangleShape;
+    public Transform rectangleMovePosition;
+    [Space]
     public Transform ball;
     public Rigidbody2D ballRigidBody;
     public float raiseSpeed = 1;
-    public float maxDistanceBetweenPoints = -4;
+    public float moveSpeed = 2;
+    public float rotateSpeed = 1;
     [Space]
     public TextMeshProUGUI levelNumberText;
     public List<GameObject> levelObjects;
@@ -28,25 +31,28 @@ public class MainManager : Singleton<MainManager>
     public AudioSource loseSound;
 
     int currentLevel = 1;
-    bool raisingLeftPoint;
-    bool raisingRightPoint;
+    bool raisingLeft;
+    bool raisingRight;
 
-    void Update()
+    void FixedUpdate()
     {
-        if (raisingLeftPoint)
+        if (raisingLeft || raisingRight)
         {
-            if (lineRendererController.checkDistanceBetweenPoints(true) <= maxDistanceBetweenPoints && lineRendererController.CanMoveHigher(true))
+            if (rectangleParent.position.y < 5)
             {
-                lineRendererController.leftPoint.transform.Translate(Vector3.up * Time.deltaTime * raiseSpeed);
+                rectangleMovePosition.Translate(Vector2.up * Time.deltaTime * raiseSpeed);
+                rectangleParent.position = Vector2.Lerp(rectangleParent.position, rectangleMovePosition.position, Time.deltaTime * moveSpeed);
             }
         }
 
-        if (raisingRightPoint)
+        if (raisingLeft)
         {
-            if (lineRendererController.checkDistanceBetweenPoints(false) <= maxDistanceBetweenPoints && lineRendererController.CanMoveHigher(false))
-            {
-                lineRendererController.rightPoint.transform.Translate(Vector3.up * Time.deltaTime * raiseSpeed);
-            }
+            rectangleShape.Rotate(new Vector3(0, 0, -rotateSpeed));
+        }
+
+        if (raisingRight)
+        {
+            rectangleShape.Rotate(new Vector3(0, 0, rotateSpeed));
         }
 
         //CHEAT
@@ -69,9 +75,10 @@ public class MainManager : Singleton<MainManager>
 
     public void ResetLevel()
     {
-        lineRendererController.leftPoint.position = new Vector2(-2, -4);
-        lineRendererController.rightPoint.position = new Vector2(2, -4);
-        lineParent.SetActive(true);
+        rectangleMovePosition.position = new Vector2(0, -4);
+        rectangleParent.position = new Vector2(0, -4);
+        rectangleShape.eulerAngles = new Vector3(0, 0, 0);
+        rectangleParent.gameObject.SetActive(true);
         ball.position = new Vector2(0, -3.6f);
         ball.gameObject.SetActive(true);
         ballRigidBody.velocity = Vector2.zero;
@@ -120,9 +127,10 @@ public class MainManager : Singleton<MainManager>
             levelObject.SetActive(false);
         }
         restartGamePanel.SetActive(true);
-        lineParent.SetActive(false);
-        lineRendererController.leftPoint.position = new Vector2(0, -100);
-        lineRendererController.rightPoint.position = new Vector2(0, -100);
+        rectangleParent.gameObject.SetActive(false);
+        rectangleParent.position = new Vector2(0, -100);
+        rectangleMovePosition.position = new Vector2(0, -100);
+        rectangleShape.eulerAngles = new Vector3(0, 0, 0);
         ball.gameObject.SetActive(false);
         levelNumberText.text = "YOU WIN!";
     }
@@ -138,22 +146,22 @@ public class MainManager : Singleton<MainManager>
 
     public void RaiseLeftPoint()
     {
-        raisingLeftPoint = true;
+        raisingLeft = true;
     }
 
     public void StopLeftPoint()
     {
-        raisingLeftPoint = false;
+        raisingLeft = false;
     }
 
     public void RaiseRightPoint()
     {
-        raisingRightPoint = true;
+        raisingRight = true;
     }
 
     public void StopRightPoint()
     {
-        raisingRightPoint = false;
+        raisingRight = false;
     }
 
     public void PlaySound(int id)

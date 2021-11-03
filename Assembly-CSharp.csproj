@@ -57,9 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\OutOfBounds.cs" />
-    <Compile Include="Assets\Scripts\LineRendererController.cs" />
     <Compile Include="Assets\Scripts\Singleton.cs" />
-    <Compile Include="Assets\Scripts\LineRendererCollision.cs" />
     <Compile Include="Assets\Scripts\GoalHole.cs" />
     <Compile Include="Assets\Scripts\MainManager.cs" />
     <Compile Include="Assets\Scripts\LoseHole.cs" />
